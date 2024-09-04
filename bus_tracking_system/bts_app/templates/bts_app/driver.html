@@ -1,0 +1,32 @@
+{% extends "../base.html" %}
+{% load static %}
+
+{% block title %}Driver's Location{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="location-box">
+        <h1>Driver's Page</h1>
+        <button id="share-location" class="location-button">Share Location</button>
+        <a href="{% url 'logout' %}" class="logout-button">Logout</a>
+    </div>
+</div>
+
+<script>
+    const ws = new WebSocket(`ws://${window.location.host}/ws/location/`);
+    
+    document.getElementById('share-location').addEventListener('click', () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition((position) => {
+                const data = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                };
+                ws.send(JSON.stringify(data));
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    });
+</script>
+{% endblock %}

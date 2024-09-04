@@ -1,0 +1,43 @@
+{% extends "../base.html" %}
+{% load static %}
+{% block title %}Bus Tracker{% endblock %}
+{% block head %}
+{{ block.super }}
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+{% endblock %}
+{% block content %}
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+<div class="container">
+    <div class="location-box">
+        <h1>Office Page</h1>
+        <div id="map"></div>
+        <a href="{% url 'logout' %}" class="logout-button">Logout</a>
+    </div>
+</div>
+
+<script>
+    const map = L.map('map').setView([0, 0], 13);
+    const ws = new WebSocket(`ws://${window.location.host}/ws/location/`);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+    }).addTo(map);
+
+    let marker;
+
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        const {latitude, longitude} = data;
+
+        // if (marker) {
+        //     map.removeLayer(marker);
+        // }
+        marker = L.marker([latitude, longitude]).addTo(map);
+        map.setView([latitude, longitude], 13);
+    };
+</script>
+
+
+{% endblock %}
